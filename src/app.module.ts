@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CoinModule } from './coin/coin.module';
+import { CoinExchangeRateModule } from './coin-exchange-rate/coin-exchange-rate.module';
 
 @Module({
   imports: [
@@ -27,9 +29,10 @@ import { ScheduleModule } from '@nestjs/schedule';
         };
       },
     }),
+    CoinModule,
+    CoinExchangeRateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
-
 })
 export class AppModule {}

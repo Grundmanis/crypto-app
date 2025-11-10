@@ -1,7 +1,25 @@
 ## Project setup
 
+## Prepare 
+
+Copy .env.example to .env and put real values
+
+
+## Running
 ```bash
 $ docker compose up --watch
+```
+
+
+## Seeding
+Get container id
+```
+docker ps
+```
+
+then run
+```
+docker exec -it <container_name_or_id> npm run seed:coins
 ```
 
 ## Tests

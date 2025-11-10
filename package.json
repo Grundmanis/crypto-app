@@ -6,6 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "nest build",
+    "seed": "npx ts-node seeds/coins.seed.ts",
+    "seed:coins": "ts-node -r tsconfig-paths/register ./seeds/coins.seed.ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -23,12 +25,14 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.17",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "axios": "^1.13.2",
     "mysql2": "^3.15.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
