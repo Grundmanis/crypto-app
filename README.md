@@ -1,3 +1,17 @@
+## Project setup
+
+```bash
+$ docker compose up --watch
+```
+
+## Tests
+
+To run test:
+```bash
+$ npm run test
+```
+
+# Dev notes
 ## Description
 Your task is to develop a cryptocurrency price-tracking application.
 
@@ -17,19 +31,29 @@ Bonus Objectives:
 Implement caching using Redis to improve performance.
 Implement a live refresh mechanism in the React application for real-time updates.
 
-## Plan
+
+## Raw plan based on the requirement
 - repo + service patterns 
+- cron service to pull the prices / every 10 secs (interval is configurable in env)
+    - by def: bitcoin + ethereum coiins, but user can add more (coins in db)
+- react for the front - separate app
+    - show latest price of the coins (in the table)
+    - show history of prices (coin prices in db for the actual price + history) - [need to implement the limit per coin]
+    - 
 
+## DB
+- coins
+- coin_exchange_rates
 
-## Project setup
+## repos
+- coinRepository
+- coinExchangeRateRepo
 
-```bash
-$ docker compose up --watch
-```
+## services 
+- CoinExchangeRateService - to pull the rate 
+- CoinExchangeRateApi - generic one , to store the api 
+- Cache service
+- websockets (for live updates)
 
-## Tests
-
-To run test:
-```bash
-$ npm run test
-```
+## env
+- EXCHANGE_RATE_PULL_INTERVAL
