@@ -7,8 +7,8 @@ By default, track the prices of Bitcoin and Ethereum. However, users should have
 Implement functionality in the React application to display the latest prices of the tracked coins. Additionally, display a historical list of up to 10 records of prices that have been changed, along with timestamps. This data should be fetched from the backend API.
 
 Technical Requirements:
-Dockerized NodeJS with Typescript for the backend. You can choose any Node.js framework, such as AdonisJS, NestJS, etc.
-Choose SQLite, MySQL, or PostgreSQL for the database.
+done -Dockerized NodeJS with Typescript for the backend. You can choose any Node.js framework, such as AdonisJS, NestJS, etc.
+done - Choose SQLite, MySQL, or PostgreSQL for the database.
 Implement the repository and service pattern for database interactions.
 Develop a simple React application for frontend display.
 Utilize the CoinGecko API for fetching cryptocurrency prices.
@@ -17,9 +17,19 @@ Bonus Objectives:
 Implement caching using Redis to improve performance.
 Implement a live refresh mechanism in the React application for real-time updates.
 
+## Plan
+- repo + service patterns 
+
 
 ## Project setup
 
 ```bash
 $ docker compose up --watch
+```
+
+## Tests
+
+To run test:
+```bash
+$ npm run test
 ```
