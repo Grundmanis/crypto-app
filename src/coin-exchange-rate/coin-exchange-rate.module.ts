@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CoinExchangeRateService } from './coin-exchange-rate.service';
 import { CoinExchangeRate } from './coin-exchange-rate.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import { CoinExchangeCronService } from './coin-exchange-cron.service';
   imports: [
     TypeOrmModule.forFeature([CoinExchangeRate]),
     HttpModule,
-    CoinModule,
+    forwardRef(() => CoinModule),
   ],
   controllers: [],
   providers: [CoinExchangeRateService, CoinExchangeCronService],
