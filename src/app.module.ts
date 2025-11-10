@@ -6,9 +6,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CoinModule } from './coin/coin.module';
 import { CoinExchangeRateModule } from './coin-exchange-rate/coin-exchange-rate.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'client', 'dist'),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -32,7 +37,7 @@ import { CoinExchangeRateModule } from './coin-exchange-rate/coin-exchange-rate.
     CoinModule,
     CoinExchangeRateModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

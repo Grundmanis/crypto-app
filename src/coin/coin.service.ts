@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Coin } from './coin.entity';
 import { Repository } from 'typeorm';
@@ -17,12 +17,19 @@ export class CoinService {
   ) {}
 
   async findAll(): Promise<Coin[]> {
-    return this.coinRepository.find();
+    return this.coinRepository
+    .createQueryBuilder('coin')
+    .leftJoinAndSelect('coin.exchangeRates', 'exchangeRate')
+    .orderBy('exchangeRate.createdAt', 'DESC') // sort exchangeRates by createdAt
+    .getMany();
+  }
+
+  async deleteCoin(id: number): Promise<void> {
+    void this.coinRepository.delete(id)
   }
 
   async create(createCoinDto: CreateCoinDto) {
     try {
-      console.log({createCoinDto});
       // validate coint exists
       const observable$ = this.httpService.get(
         `${this.configService.get('API_URL')}/coins/${createCoinDto.name.toLowerCase()}?${this.configService.getOrThrow('API_AUTH_KEY')}=${this.configService.getOrThrow('API_KEY')}`,
@@ -30,12 +37,18 @@ export class CoinService {
   
       // Convert Observable to Promise
       const response = await firstValueFrom(observable$);
-  
-      console.log("response.data", response.data.error);
+
+      // assune we have data here
+      const coin = this.coinRepository.create({
+        name: response.data.name,
+        symbol: response.data.symbol,
+        apiId: response.data.id,
+      });
+      await this.coinRepository.save(coin);
 
     } catch (e) {
-      // throw error
-      console.log(e);
+      console.log("e",e);
+      throw new HttpException(e.response.data.error, HttpStatus.BAD_REQUEST);
     }
   }
 }

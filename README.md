@@ -10,6 +10,12 @@ Copy .env.example to .env and put real values
 $ docker compose up --watch
 ```
 
+## Build front
+```bash
+cd client && npm run build
+```
+
+# TODO: add front build in docker 
 
 ## Seeding
 Get container id

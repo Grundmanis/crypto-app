@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CoinService } from './coin.service';
 import { Coin } from './coin.entity';
 
@@ -22,4 +22,10 @@ export class CoinController {
   saveCoin(@Body() createCoinDto: CreateCoinDto): Promise<void> {
     return this.coinService.create(createCoinDto);
   }
+
+  @Delete(':id') 
+  deleteCoin(@Param('id') id: number): Promise<void> {
+    return this.coinService.deleteCoin(id);
+  }
 }
+§
