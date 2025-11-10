@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CoinExchangeRateController } from './coin-exchange-rate.controller';
 import { CoinExchangeRateService } from './coin-exchange-rate.service';
 import { CoinExchangeRate } from './coin-exchange-rate.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { CoinModule } from 'src/coin/coin.module';
+import { CoinExchangeCronService } from './coin-exchange-cron.service';
 
 @Module({
   imports: [
@@ -12,8 +12,8 @@ import { CoinModule } from 'src/coin/coin.module';
     HttpModule,
     CoinModule,
   ],
-  controllers: [CoinExchangeRateController],
-  providers: [CoinExchangeRateService],
+  controllers: [],
+  providers: [CoinExchangeRateService, CoinExchangeCronService],
   exports: [CoinExchangeRateService],
 })
 export class CoinExchangeRateModule {}

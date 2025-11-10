@@ -1,61 +1,56 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Coin } from './coin.entity';
 import { Repository } from 'typeorm';
 import { CreateCoinDto } from './coin.controller';
-import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { CoinGateway } from './coin.gateway';
+import { CoinExchangeApiService } from 'src/coin-exchange-rate/coin-exchange-api.service';
 
 @Injectable()
 export class CoinService {
+  private readonly logger = new Logger(CoinService.name);
+
   constructor(
     @InjectRepository(Coin)
     private readonly coinRepository: Repository<Coin>,
-    private readonly configService: ConfigService,
-    private readonly httpService: HttpService,
-    private readonly coinGateway: CoinGateway
+    private readonly coinExchangeApoService: CoinExchangeApiService,
+    private readonly coinGateway: CoinGateway,
   ) {}
 
   async findAll(): Promise<Coin[]> {
-    return this.coinRepository
-    .createQueryBuilder('coin')
-    .leftJoinAndSelect('coin.exchangeRates', 'exchangeRate')
-    .orderBy('exchangeRate.createdAt', 'DESC') // sort exchangeRates by createdAt
-    .getMany();
+    const coins = await this.coinRepository
+      .createQueryBuilder('coin')
+      .leftJoinAndSelect('coin.exchangeRates', 'exchangeRate')
+      .orderBy('coin.createdAt', 'DESC')
+      .getMany();
+
+    return coins.map((coin) => ({
+      ...coin,
+      exchangeRates: coin.exchangeRates.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      ),
+    }));
   }
 
   async deleteCoin(id: number): Promise<void> {
-    void this.coinRepository.delete(id)
+    void this.coinRepository.delete(id);
   }
 
-  async create(createCoinDto: CreateCoinDto) {
-    try {
-      // validate coint exists
-      const observable$ = this.httpService.get(
-        `${this.configService.get('API_URL')}/coins/${createCoinDto.name.toLowerCase()}?${this.configService.getOrThrow('API_AUTH_KEY')}=${this.configService.getOrThrow('API_KEY')}`,
-      );
-  
-      // Convert Observable to Promise
-      const response = await firstValueFrom(observable$);
-
-      // assune we have data here
+  async create(createCoinDto: CreateCoinDto): Promise<void>{
+      const targetCoin = await this.coinExchangeApoService.getCoin(createCoinDto.name)
       const coin = this.coinRepository.create({
-        name: response.data.name,
-        symbol: response.data.symbol,
-        apiId: response.data.id,
+        name: targetCoin.name,
+        symbol: targetCoin.symbol,
+        apiId: targetCoin.id,
       });
       await this.coinRepository.save(coin);
 
-    } catch (e) {
-      console.log("e",e);
-      throw new HttpException(e.response.data.error, HttpStatus.BAD_REQUEST);
+      // TODO: update rate here by second argument
     }
-  }
 
-  async sendUpdate(data: any) {
-    if (data.action === "rateUpdate") {
+  async sendUpdate(data: any): Promise<void> {
+    // todo: const for action
+    if (data.action === 'rateUpdate') {
       const coins = await this.findAll();
       data.coins = coins;
     }

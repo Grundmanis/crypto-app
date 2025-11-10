@@ -13,9 +13,8 @@ export class CoinExchangeRate {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // Foreign key relation to Coin
   @ManyToOne(() => Coin, (coin) => coin.exchangeRates, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'coinId' }) // optional: customize FK column name
+  @JoinColumn({ name: 'coinId' }) 
   coin: Coin;
 
   @Column({ type: 'json' })
