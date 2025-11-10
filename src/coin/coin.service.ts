@@ -6,6 +6,7 @@ import { CreateCoinDto } from './coin.controller';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { CoinGateway } from './coin.gateway';
 
 @Injectable()
 export class CoinService {
@@ -14,6 +15,7 @@ export class CoinService {
     private readonly coinRepository: Repository<Coin>,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+    private readonly coinGateway: CoinGateway
   ) {}
 
   async findAll(): Promise<Coin[]> {
@@ -50,5 +52,13 @@ export class CoinService {
       console.log("e",e);
       throw new HttpException(e.response.data.error, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async sendUpdate(data: any) {
+    if (data.action === "rateUpdate") {
+      const coins = await this.findAll();
+      data.coins = coins;
+    }
+    this.coinGateway.server.emit('coinUpdate', data);
   }
 }

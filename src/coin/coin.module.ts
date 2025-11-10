@@ -4,11 +4,12 @@ import { CoinController } from './coin.controller';
 import { Coin } from './coin.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
+import { CoinGateway } from './coin.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Coin]), 
       HttpModule],
-  providers: [CoinService],
+  providers: [CoinService, CoinGateway],
   controllers: [CoinController],
   exports: [CoinService],
 })

@@ -31,45 +31,43 @@ export class CoinExchangeRateService {
   }
 
   // TODO: limit error from api
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
     this.logger.debug(`Called when the current second is`);
     const coins = await this.coinService.findAll();
-    // TODO: refactor
-    coins.forEach((coin) => {
-      this.getCoinCurrenyPrice(coin);
-    });
+
+    const targetCoins = coins.map(coin => coin.apiId).join(',');
+    console.log({targetCoins});
+    const data = await this.getCoinCurrenyPrice(targetCoins);
+    console.log({data});
+
+    for (const coin of coins) {
+        if (!data[coin.apiId]) {
+          console.log("cont, no apiId", coin.apiId);
+          continue;
+        }
+         // save in db
+        await this.createRecord({
+          coinId: coin.id,
+          currentPrice: data[coin.apiId]
+        }); 
+        console.log("saved record");
+    }
+
+    this.coinService.sendUpdate({ action: 'rateUpdate'});
   }
 
-  // TODO: move out
-  async getCoinData(coinId) {
-    
-  }
-
-  async getCoinCurrenyPrice(coin: Coin) {
-    const observable$ = this.httpService.get(
-      // TODO: change
-      `${this.configService.get('API_URL')}/coins/${coin.apiId}`,
-    );
-
-    // const observable$ = this.httpService.get(
-    //   `${this.configService.get('API_URL')}/coins/${coinId}?${this.configService.getOrThrow('API_AUTH_KEY')}=${this.configService.getOrThrow('API_KEY')}`,
-    // );
+  async getCoinCurrenyPrice(targetCoins: string, targetCurrency: string = 'eur') {
+    const url =  `${this.configService.get('API_URL')}/simple/price/?ids=${targetCoins}&vs_currencies=${targetCurrency}&${this.configService.getOrThrow('API_AUTH_KEY')}=${this.configService.getOrThrow('API_KEY')}`;
+    console.log({url});
+    const observable$ = this.httpService.get(url);
 
     // Convert Observable to Promise
     const response = await firstValueFrom(observable$);
 
-    // AxiosResponse has { data, status, headers, config }
-    console.log(Object.keys(response.data)); // THIS should show your actual API keys
-    const coinData = response.data;
+    return response.data;
     // TODO: validate coin data exists
     // TODO: add types
-
-    // save in db
-    await this.createRecord({
-      coinId: coin.id,
-      currentPrice: coinData.market_data.current_price,
-    });
   }
 
   async createRecord(data: unknown) {

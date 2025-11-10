@@ -28,4 +28,3 @@ export class CoinController {
     return this.coinService.deleteCoin(id);
   }
 }
-§

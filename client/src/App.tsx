@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronRight, Plus, Trash2, X } from "lucide-react";
+import { io, Socket } from 'socket.io-client';
 import './App.css';
 
 function App() {
@@ -8,9 +9,27 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(null);
   const [newCoinName, setNewCoinName] = useState("");
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    // Connect to backend WebSocket
+    const s = io('http://localhost:3000');
+    setSocket(s);
+
+    s.on('coinUpdate', (data) => {
+      console.log('Update received', data);
+      if (data.action === 'rateUpdate') {
+        setCoins(data.coins);
+      }
+    });
+
+    return () => {
+      s.disconnect();
+    };
   }, []);
 
   async function fetchData() {

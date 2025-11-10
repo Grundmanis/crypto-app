@@ -47,9 +47,9 @@ Implement functionality in the React application to display the latest prices of
 Technical Requirements:
 done -Dockerized NodeJS with Typescript for the backend. You can choose any Node.js framework, such as AdonisJS, NestJS, etc.
 done - Choose SQLite, MySQL, or PostgreSQL for the database.
-Implement the repository and service pattern for database interactions.
-Develop a simple React application for frontend display.
-Utilize the CoinGecko API for fetching cryptocurrency prices.
+done - Implement the repository and service pattern for database interactions.
+done - Develop a simple React application for frontend display.
+done - Utilize the CoinGecko API for fetching cryptocurrency prices.
 
 Bonus Objectives:
 Implement caching using Redis to improve performance.
