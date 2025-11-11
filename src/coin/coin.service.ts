@@ -4,8 +4,8 @@ import { Coin } from './coin.entity';
 import { Repository } from 'typeorm';
 import { CreateCoinDto } from './coin.controller';
 import { CoinGateway } from './coin.gateway';
-import { CoinExchangeApiService } from 'src/coin-exchange-rate/coin-exchange-api.service';
-import { CoinExchangeRateService } from 'src/coin-exchange-rate/coin-exchange-rate.service';
+import { CoinExchangeApiService } from '../coin-exchange-rate/coin-exchange-api.service';
+import { CoinExchangeRateService } from '../coin-exchange-rate/coin-exchange-rate.service';
 
 @Injectable()
 export class CoinService {

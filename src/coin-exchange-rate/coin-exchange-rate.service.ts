@@ -2,9 +2,9 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoinExchangeRate } from './coin-exchange-rate.entity';
 import { Repository } from 'typeorm';
-import { CoinService } from 'src/coin/coin.service';
+import { CoinService } from '../coin/coin.service';
 import { CoinExchangeApiService } from './coin-exchange-api.service';
-import { Coin } from 'src/coin/coin.entity';
+import { Coin } from '../coin/coin.entity';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -18,6 +18,8 @@ export type CoinPrices = {
 export class CoinExchangeRateService {
   private readonly logger = new Logger(CoinExchangeRateService.name);
 
+  private readonly historyLimit: number = 10;
+
   constructor(
     @Inject(forwardRef(() => CoinExchangeCronService))
     private readonly coinExchangeCronService: CoinExchangeCronService,
@@ -28,7 +30,10 @@ export class CoinExchangeRateService {
     private readonly coinExchangeApiService: CoinExchangeApiService,
     private readonly configService: ConfigService,
   ) {
-    this.coinExchangeCronService.startJob(Number(this.configService.get('EXCHANGE_RATE_PULL_INTERVAL_SECONDS')) || 10);
+    this.coinExchangeCronService.startJob(
+      Number(this.configService.get('EXCHANGE_RATE_PULL_INTERVAL_SECONDS')) ||
+        10,
+    );
   }
 
   async findAll(): Promise<CoinExchangeRate[]> {
@@ -61,8 +66,28 @@ export class CoinExchangeRateService {
         currentPrice: data[coin.apiId],
       });
       this.logger.debug(`Saved in db`);
+
+      await this.trimHistory(coin.id);
     }
 
     this.coinService.sendUpdate({ action: 'rate_update' });
+  }
+
+  private async trimHistory(coinId: number): Promise<void> {
+    this.logger.debug(`Trim history for coin ${coinId}`);
+    const rates = await this.coinExchangeRateRepository
+      .createQueryBuilder('rate')
+      .select(['rate.id', 'rate.createdAt'])
+      .where('rate.coinId = :coinId', { coinId })
+      .orderBy('rate.createdAt', 'DESC')
+      .getMany();
+
+    const oldRecordIds = rates.slice(10).map((r) => r.id);
+
+    this.logger.debug('oldRecords length', oldRecordIds.length);
+
+    if (oldRecordIds.length > 0) {
+      await this.coinExchangeRateRepository.delete(oldRecordIds);
+    }
   }
 }

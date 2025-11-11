@@ -16,13 +16,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Connect to backend WebSocket
     const s = io('http://localhost:3000');
     setSocket(s);
 
     s.on('coinUpdate', (data) => {
       console.log('Update received', data);
-      if (data.action === 'rateUpdate') {
+      if (data.action === 'rate_update') {
+        console.log("set coins");
         setCoins(data.coins);
       }
     });
@@ -82,6 +82,7 @@ function App() {
               <th className="p-4 font-semibold uppercase text-xs tracking-wider">Coin</th>
               <th className="p-4 font-semibold uppercase text-xs tracking-wider">Price €</th>
               <th className="p-4 font-semibold uppercase text-xs tracking-wider">Created</th>
+              <th className="p-4 font-semibold uppercase text-xs tracking-wider">Rate updated</th>
               <th className="p-4 w-10" />
               <th className="p-4 w-10" />
             </tr>
@@ -97,6 +98,7 @@ function App() {
                   <td className="p-4 font-medium group-hover:text-blue-400 transition-colors">{coin.name}</td>
                   <td className="p-4">{coin.exchangeRates.length ? coin.exchangeRates[0].currentPrice.eur : ''}</td>
                   <td className="p-4 text-sm text-gray-400">{new Date(coin.createdAt).toLocaleString()}</td>
+                  <td className="p-4 text-sm text-gray-400">{coin.exchangeRates.length ? new Date(coin.exchangeRates[0].createdAt).toLocaleString() : ''}</td>
                   <td className="p-4">
                     {expanded === coin.id ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                   </td>

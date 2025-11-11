@@ -1,4 +1,4 @@
-import { Coin } from 'src/coin/coin.entity';
+import { Coin } from '../coin/coin.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -1,4 +1,4 @@
-import { CoinExchangeRate } from 'src/coin-exchange-rate/coin-exchange-rate.entity';
+import { CoinExchangeRate } from '../coin-exchange-rate/coin-exchange-rate.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

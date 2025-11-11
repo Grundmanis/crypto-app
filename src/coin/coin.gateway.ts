@@ -28,7 +28,6 @@ export class CoinGateway
     this.logger.debug(`Client disconnected: ${client.id}`);
   }
 
-  // Custom method to emit updates
   sendUpdate(data: any) {
     this.server.emit('coinUpdate', data);
   }

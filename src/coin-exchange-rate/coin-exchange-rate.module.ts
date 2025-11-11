@@ -14,7 +14,11 @@ import { CoinExchangeApiService } from './coin-exchange-api.service';
     forwardRef(() => CoinModule),
   ],
   controllers: [],
-  providers: [CoinExchangeRateService, CoinExchangeCronService, CoinExchangeApiService],
+  providers: [
+    CoinExchangeRateService,
+    CoinExchangeCronService,
+    CoinExchangeApiService,
+  ],
   exports: [CoinExchangeRateService, CoinExchangeApiService],
 })
 export class CoinExchangeRateModule {}
