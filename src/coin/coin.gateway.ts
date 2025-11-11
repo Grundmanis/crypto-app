@@ -13,7 +13,7 @@ export class CoinGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  
+
   private readonly logger = new Logger(CoinGateway.name);
 
   afterInit(server: Server) {

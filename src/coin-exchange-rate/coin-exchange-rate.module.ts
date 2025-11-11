@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { CoinModule } from 'src/coin/coin.module';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
+import { CoinExchangeApiService } from './coin-exchange-api.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { CoinExchangeCronService } from './coin-exchange-cron.service';
     forwardRef(() => CoinModule),
   ],
   controllers: [],
-  providers: [CoinExchangeRateService, CoinExchangeCronService],
-  exports: [CoinExchangeRateService],
+  providers: [CoinExchangeRateService, CoinExchangeCronService, CoinExchangeApiService],
+  exports: [CoinExchangeRateService, CoinExchangeApiService],
 })
 export class CoinExchangeRateModule {}

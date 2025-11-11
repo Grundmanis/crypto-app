@@ -9,7 +9,6 @@ export class CreateCoinDto {
 
 @Controller('coins')
 export class CoinController {
-
   constructor(private readonly coinService: CoinService) {}
 
   @Get()

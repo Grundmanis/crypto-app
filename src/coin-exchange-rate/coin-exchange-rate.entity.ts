@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
+import type { CoinPrices } from './coin-exchange-rate.service';
 
 @Entity()
 export class CoinExchangeRate {
@@ -14,11 +15,11 @@ export class CoinExchangeRate {
   id: number;
 
   @ManyToOne(() => Coin, (coin) => coin.exchangeRates, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'coinId' }) 
+  @JoinColumn({ name: 'coinId' })
   coin: Coin;
 
   @Column({ type: 'json' })
-  currentPrice: Record<string, number>;
+  currentPrice: CoinPrices;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

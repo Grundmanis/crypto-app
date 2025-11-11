@@ -11,6 +11,10 @@ import { CoinExchangeRateService } from 'src/coin-exchange-rate/coin-exchange-ra
 export class CoinService {
   private readonly logger = new Logger(CoinService.name);
 
+  public static EVENTS = {
+    COIN_UPDATE: 'coinUpdate',
+  };
+
   constructor(
     @InjectRepository(Coin)
     private readonly coinRepository: Repository<Coin>,
@@ -24,46 +28,47 @@ export class CoinService {
     const query = this.coinRepository
       .createQueryBuilder('coin')
       .leftJoinAndSelect('coin.exchangeRates', 'exchangeRate');
-  
+
     if (filters.name) {
       query.andWhere('coin.name LIKE :name', { name: `%${filters.name}%` });
     }
-  
+
     query.orderBy('coin.createdAt', 'DESC');
-  
+
     const coins = await query.getMany();
-    const sortedCoins = coins.map(coin => ({
+    const sortedCoins = coins.map((coin) => ({
       ...coin,
       exchangeRates: coin.exchangeRates.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       ),
     }));
-  
+
     return sortedCoins;
   }
 
   async deleteCoin(id: number): Promise<void> {
-    void this.coinRepository.delete(id);
+    await this.coinRepository.delete(id);
   }
 
-  async create(createCoinDto: CreateCoinDto): Promise<void>{
-      const targetCoin = await this.coinExchangeApiService.getCoin(createCoinDto.name)
-      const coin = this.coinRepository.create({
-        name: targetCoin.name,
-        symbol: targetCoin.symbol,
-        apiId: targetCoin.id,
-      });
-      await this.coinRepository.save(coin);
+  async create(createCoinDto: CreateCoinDto): Promise<void> {
+    const targetCoin = await this.coinExchangeApiService.getCoin(
+      createCoinDto.name,
+    );
+    const coin = this.coinRepository.create({
+      name: targetCoin.name,
+      symbol: targetCoin.symbol,
+      apiId: targetCoin.id,
+    });
+    await this.coinRepository.save(coin);
 
-    this.coinExchangeRateService.updateCoinsRate({name: coin.name});
-    }
+    this.coinExchangeRateService.updateCoinsRate({ name: coin.name });
+  }
 
-  async sendUpdate(data: any): Promise<void> {
-    // todo: const for action
-    if (data.action === 'rateUpdate') {
+  async sendUpdate(data: { action: string; coins?: Coin[] }): Promise<void> {
+    if (data.action === 'rate_update') {
       const coins = await this.findAll();
       data.coins = coins;
     }
-    this.coinGateway.server.emit('coinUpdate', data);
+    this.coinGateway.server.emit(CoinService.EVENTS.COIN_UPDATE, data);
   }
 }

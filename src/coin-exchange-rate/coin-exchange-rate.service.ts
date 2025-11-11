@@ -4,55 +4,65 @@ import { CoinExchangeRate } from './coin-exchange-rate.entity';
 import { Repository } from 'typeorm';
 import { CoinService } from 'src/coin/coin.service';
 import { CoinExchangeApiService } from './coin-exchange-api.service';
+import { Coin } from 'src/coin/coin.entity';
+import { CoinExchangeCronService } from './coin-exchange-cron.service';
+import { ConfigService } from '@nestjs/config';
+
+export type CoinPrices = {
+  [coinId: string]: {
+    [currency: string]: number;
+  };
+};
 
 @Injectable()
 export class CoinExchangeRateService {
-
   private readonly logger = new Logger(CoinExchangeRateService.name);
 
   constructor(
+    @Inject(forwardRef(() => CoinExchangeCronService))
+    private readonly coinExchangeCronService: CoinExchangeCronService,
     @InjectRepository(CoinExchangeRate)
     private readonly coinExchangeRateRepository: Repository<CoinExchangeRate>,
     @Inject(forwardRef(() => CoinService))
     private readonly coinService: CoinService,
     private readonly coinExchangeApiService: CoinExchangeApiService,
+    private readonly configService: ConfigService,
   ) {
+    this.coinExchangeCronService.startJob(Number(this.configService.get('EXCHANGE_RATE_PULL_INTERVAL_SECONDS')) || 10);
   }
 
   async findAll(): Promise<CoinExchangeRate[]> {
     return this.coinExchangeRateRepository.find();
   }
 
-  async createRecord(data: unknown) {
+  async createRecord(data): Promise<void> {
     const exchangeRate = new CoinExchangeRate();
-    // @ts-ignore
-    exchangeRate.coin = data.coinId;
-    // @ts-ignore
+    exchangeRate.coin = { id: data.coinId } as Coin;
     exchangeRate.currentPrice = data.currentPrice;
     await this.coinExchangeRateRepository.save(exchangeRate);
   }
 
-  // TODO: any
   async updateCoinsRate(filters: { name?: string } = {}) {
     const coins = await this.coinService.findAll(filters);
     const targetCoins = coins.map((coin) => coin.apiId).join(',');
-    this.logger.debug(`Target coins ${targetCoins}`)
-    const data = await this.coinExchangeApiService.getCoinsCurrentPrice(targetCoins);
-    this.logger.debug(`Target coin current prices ${data}`)
+    this.logger.debug(`Target coins ${targetCoins}`);
+    const data =
+      await this.coinExchangeApiService.getCoinsCurrentPrice(targetCoins);
+    this.logger.debug(`Target coin current prices ${data}`);
 
     for (const coin of coins) {
-      this.logger.debug(`Updating ${coin.apiId}`)
+      this.logger.debug(`Updating ${coin.apiId}`);
       if (!data[coin.apiId]) {
-        this.logger.debug(`No coin info, skipping`)
+        this.logger.debug(`No coin info, skipping`);
         continue;
       }
       await this.createRecord({
         coinId: coin.id,
         currentPrice: data[coin.apiId],
       });
-      this.logger.debug(`Saved in db`)
+      this.logger.debug(`Saved in db`);
     }
 
-    this.coinService.sendUpdate({ action: 'rateUpdate' });
+    this.coinService.sendUpdate({ action: 'rate_update' });
   }
 }

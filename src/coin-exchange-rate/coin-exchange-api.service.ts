@@ -11,9 +11,8 @@ export class CoinExchangeApiService {
     private readonly httpService: HttpService,
   ) {}
 
-  // TODO: return type
-  async getCoin(coinId: string) {
-      return this.makeRequest(`/coins/${coinId.toLowerCase()}`)
+  async getCoin(coinId: string): Promise<{name: string, symbol: string, id: string}> {
+    return this.makeRequest(`/coins/${coinId.toLowerCase()}`);
   }
 
   // TODO: return type
@@ -23,7 +22,7 @@ export class CoinExchangeApiService {
   ) {
     return this.makeRequest(`/simple/price/`, {
       ids: targetCoins,
-      vs_currencies: targetCurrencies
+      vs_currencies: targetCurrencies,
     });
   }
 
@@ -50,5 +49,4 @@ export class CoinExchangeApiService {
       throw new HttpException(e.response.data.error, HttpStatus.BAD_REQUEST);
     }
   }
-  
 }
