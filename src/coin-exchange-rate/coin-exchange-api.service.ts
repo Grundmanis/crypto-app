@@ -13,9 +13,7 @@ export class CoinExchangeApiService {
     private readonly httpService: HttpService,
   ) {}
 
-  async getCoin(
-    coinId: string,
-  ): Promise<CoinData> {
+  async getCoin(coinId: string): Promise<CoinData> {
     return this.makeRequest(`/coins/${coinId.toLowerCase()}`);
   }
 

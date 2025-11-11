@@ -1,1 +1,1 @@
-export type CoinData = { name: string; symbol: string; id: string }
+export type CoinData = { name: string; symbol: string; id: string };

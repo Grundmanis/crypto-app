@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { CoinGateway } from './coin.gateway';
 import { CoinExchangeRateModule } from 'src/coin-exchange-rate/coin-exchange-rate.module';
+import { redisProvider } from 'src/redis.provider';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { CoinExchangeRateModule } from 'src/coin-exchange-rate/coin-exchange-rat
     HttpModule,
     forwardRef(() => CoinExchangeRateModule),
   ],
-  providers: [CoinService, CoinGateway],
+  providers: [CoinService, CoinGateway, redisProvider],
   controllers: [CoinController],
   exports: [CoinService],
 })

@@ -6,10 +6,13 @@ import { CoinGateway } from './coin.gateway';
 import { CoinExchangeApiService } from '../coin-exchange-rate/coin-exchange-api.service';
 import { CoinExchangeRateService } from '../coin-exchange-rate/coin-exchange-rate.service';
 import { CreateCoinDto } from './dto/create-coin.dto';
+import Redis from 'ioredis';
 
 @Injectable()
 export class CoinService {
   private readonly logger = new Logger(CoinService.name);
+  private readonly cacheTTL =
+    Number(process.env.EXCHANGE_RATE_PULL_INTERVAL_SECONDS) || 10;
 
   public static EVENTS = {
     COIN_UPDATE: 'coinUpdate',
@@ -22,9 +25,18 @@ export class CoinService {
     @Inject(forwardRef(() => CoinExchangeRateService))
     private readonly coinExchangeRateService: CoinExchangeRateService,
     private readonly coinGateway: CoinGateway,
+    @Inject('REDIS_CLIENT')
+    private readonly redisClient: Redis,
   ) {}
 
   async findAll(filters: { name?: string } = {}): Promise<Coin[]> {
+    const cacheKey = `coins:${filters.name || 'all'}`;
+    const cached = await this.redisClient.get(cacheKey);
+    if (cached) {
+      console.log({ cached });
+      return JSON.parse(cached) as Coin[];
+    }
+
     const query = this.coinRepository
       .createQueryBuilder('coin')
       .leftJoinAndSelect('coin.exchangeRates', 'exchangeRate');
@@ -42,6 +54,13 @@ export class CoinService {
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
       ),
     }));
+
+    await this.redisClient.set(
+      cacheKey,
+      JSON.stringify(sortedCoins),
+      'EX',
+      this.cacheTTL,
+    );
 
     return sortedCoins;
   }

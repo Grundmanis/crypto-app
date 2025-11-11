@@ -8,6 +8,22 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
   server:
     build:
       context: .
@@ -28,6 +44,8 @@ services:
     ports:
       - "${PORT}:${PORT}"
     depends_on:
+      redis:
+        condition: service_healthy
       db:
         condition: service_healthy
   db:
@@ -54,6 +72,7 @@ services:
       retries: 5
 volumes:
   db-data:
+  redis_data:
 secrets:
   db-password:
     file: db/password.txt

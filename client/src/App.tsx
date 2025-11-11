@@ -22,6 +22,7 @@ function App() {
   const [newCoinName, setNewCoinName] = useState("");
   // @ts-ignore
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [coinErrorMsg, setCoinErrorMsg] = useState<null|string>(null);
 
   // Fetch initial coins
   useEffect(() => {
@@ -53,16 +54,24 @@ function App() {
 
   async function handleAddCoin() {
     if (!newCoinName) return;
-    const res = await fetch("/api/coins", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newCoinName }),
-    });
+    try {
+      const res = await fetch("/api/coins", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCoinName }),
+      });
 
-    if (res.status === 201 || res.ok) {
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Something went wrong");
+      }
+
       setShowAddModal(false);
       setNewCoinName("");
+      setCoinErrorMsg(null);
       fetchData();
+    } catch (e: any) {
+      setCoinErrorMsg(e.message);
     }
   }
 
@@ -172,6 +181,11 @@ function App() {
               value={newCoinName}
               onChange={(e) => setNewCoinName(e.target.value)}
             />
+            {coinErrorMsg && (
+              <p className="text-red-600 mb-4 bg-red-100 border border-red-400 px-3 py-2 rounded-md mt-2">
+                {coinErrorMsg}
+              </p>
+            )}
             <button
               onClick={handleAddCoin}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
