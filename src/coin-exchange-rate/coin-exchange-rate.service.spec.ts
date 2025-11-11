@@ -36,6 +36,7 @@ describe('CoinExchangeRateService', () => {
         { id: 2, apiId: 'ethereum' },
       ]),
       sendUpdate: jest.fn(),
+      clearCache: jest.fn(),
     };
 
     mockCoinApiService = {

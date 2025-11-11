@@ -19,6 +19,7 @@ describe('CoinService', () => {
     save: jest.fn(),
     find: jest.fn(),
     delete: jest.fn(),
+    findOne: jest.fn(),
     createQueryBuilder: jest.fn(() => ({
       leftJoinAndSelect: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
@@ -77,10 +78,18 @@ describe('CoinService', () => {
     });
 
     it('should fetch from DB and set cache if cache miss', async () => {
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([
+          { id: 1, name: 'Bitcoin', exchangeRates: [] },
+        ]),
+      };
+      
+      mockRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder);
       mockRedis.get.mockResolvedValue(null);
-      mockRepo.createQueryBuilder().getMany.mockResolvedValue([
-        { id: 1, name: 'Bitcoin', exchangeRates: [] },
-      ]);
+      mockRedis.set.mockResolvedValue('OK');
 
       const result = await service.findAll();
       expect(result).toEqual([{ id: 1, name: 'Bitcoin', exchangeRates: [] }]);
@@ -109,7 +118,10 @@ describe('CoinService', () => {
 
   describe('deleteCoin', () => {
     it('should call repository delete', async () => {
+      mockRepo.findOne.mockReturnValue({ name: 'Bitcoin', symbol: 'BTC', apiId: 'bitcoin' });
+
       await service.deleteCoin(1);
+
       expect(mockRepo.delete).toHaveBeenCalledWith(1);
     });
   });
@@ -117,6 +129,7 @@ describe('CoinService', () => {
   describe('sendUpdate', () => {
     it('should emit rate_update event with coins', async () => {
       const coins = [{ id: 1, name: 'Bitcoin', exchangeRates: [] }];
+      // @ts-ignore
       jest.spyOn(service, 'findAll').mockResolvedValue(coins);
 
       await service.sendUpdate({ action: 'rate_update' });
