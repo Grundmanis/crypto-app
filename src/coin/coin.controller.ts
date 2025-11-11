@@ -1,11 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CoinService } from './coin.service';
 import { Coin } from './coin.entity';
-
-// TODO: move out
-export class CreateCoinDto {
-  name: string;
-}
+import { CreateCoinDto } from './dto/create-coin.dto';
 
 @Controller('coins')
 export class CoinController {

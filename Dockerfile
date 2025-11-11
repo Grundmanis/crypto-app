@@ -13,7 +13,13 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
-# Build the NestJS application
+# Build React frontend
+WORKDIR /usr/src/app/client
+RUN npm install
+RUN npm run build
+
+# Go back to the backend folder and build NestJS
+WORKDIR /usr/src/app
 RUN npm run build
 
 # Expose the application port

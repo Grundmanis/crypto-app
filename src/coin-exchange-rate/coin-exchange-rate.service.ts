@@ -7,17 +7,11 @@ import { CoinExchangeApiService } from './coin-exchange-api.service';
 import { Coin } from '../coin/coin.entity';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
 import { ConfigService } from '@nestjs/config';
-
-export type CoinPrices = {
-  [coinId: string]: {
-    [currency: string]: number;
-  };
-};
+import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 
 @Injectable()
 export class CoinExchangeRateService {
   private readonly logger = new Logger(CoinExchangeRateService.name);
-
   private readonly historyLimit: number = 10;
 
   constructor(
@@ -40,7 +34,7 @@ export class CoinExchangeRateService {
     return this.coinExchangeRateRepository.find();
   }
 
-  async createRecord(data): Promise<void> {
+  async createRecord(data: CreateExchangeRateDto): Promise<void> {
     const exchangeRate = new CoinExchangeRate();
     exchangeRate.coin = { id: data.coinId } as Coin;
     exchangeRate.currentPrice = data.currentPrice;
@@ -49,28 +43,26 @@ export class CoinExchangeRateService {
 
   async updateCoinsRate(filters: { name?: string } = {}) {
     const coins = await this.coinService.findAll(filters);
+
     const targetCoins = coins.map((coin) => coin.apiId).join(',');
     this.logger.debug(`Target coins ${targetCoins}`);
     const data =
       await this.coinExchangeApiService.getCoinsCurrentPrice(targetCoins);
-    this.logger.debug(`Target coin current prices ${data}`);
 
     for (const coin of coins) {
-      this.logger.debug(`Updating ${coin.apiId}`);
       if (!data[coin.apiId]) {
-        this.logger.debug(`No coin info, skipping`);
         continue;
       }
       await this.createRecord({
         coinId: coin.id,
         currentPrice: data[coin.apiId],
       });
-      this.logger.debug(`Saved in db`);
-
       await this.trimHistory(coin.id);
     }
 
-    this.coinService.sendUpdate({ action: 'rate_update' });
+    if (coins.length) {
+      await this.coinService.sendUpdate({ action: 'rate_update' });
+    }
   }
 
   private async trimHistory(coinId: number): Promise<void> {
@@ -82,7 +74,7 @@ export class CoinExchangeRateService {
       .orderBy('rate.createdAt', 'DESC')
       .getMany();
 
-    const oldRecordIds = rates.slice(10).map((r) => r.id);
+    const oldRecordIds = rates.slice(this.historyLimit).map((r) => r.id);
 
     this.logger.debug('oldRecords length', oldRecordIds.length);
 

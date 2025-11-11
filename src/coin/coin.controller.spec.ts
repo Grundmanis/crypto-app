@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CoinController, CreateCoinDto } from './coin.controller';
+import { CoinController } from './coin.controller';
 import { CoinService } from './coin.service';
 import { Coin } from './coin.entity';
+import { CreateCoinDto } from './dto/create-coin.dto';
 
 describe('CoinController', () => {
   let controller: CoinController;

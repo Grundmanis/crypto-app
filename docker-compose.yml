@@ -34,14 +34,13 @@ services:
     image: mysql:8.0
     restart: always
     user: mysql
+    env_file: 
+      - .env
     environment:
-      MYSQL_DATABASE: example_db
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD_FILE: /run/secrets/db-password
-      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db-root-password
-    secrets:
-      - db-password
-      - db-root-password
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
     expose:

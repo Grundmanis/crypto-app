@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   CoinExchangeRateService,
-  CoinPrices,
 } from './coin-exchange-rate.service';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
 import { CoinService } from '../coin/coin.service';
@@ -78,6 +77,7 @@ describe('CoinExchangeRateService', () => {
   describe('createRecord', () => {
     it('should save a coin exchange rate record', async () => {
       const data = { coinId: 1, currentPrice: { bitcoin: { eur: 50000 } } };
+      // @ts-ignore
       await service.createRecord(data);
 
       expect(mockRepo.save).toHaveBeenCalledWith(

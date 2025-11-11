@@ -1,0 +1,1 @@
+export type CoinData = { name: string; symbol: string; id: string }

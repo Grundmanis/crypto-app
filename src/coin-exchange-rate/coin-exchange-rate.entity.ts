@@ -7,7 +7,6 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
-import type { CoinPrices } from './coin-exchange-rate.service';
 
 @Entity()
 export class CoinExchangeRate {
@@ -19,7 +18,7 @@ export class CoinExchangeRate {
   coin: Coin;
 
   @Column({ type: 'json' })
-  currentPrice: CoinPrices;
+  currentPrice: { [currency: string]: number };
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

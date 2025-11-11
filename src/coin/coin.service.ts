@@ -2,10 +2,10 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Coin } from './coin.entity';
 import { Repository } from 'typeorm';
-import { CreateCoinDto } from './coin.controller';
 import { CoinGateway } from './coin.gateway';
 import { CoinExchangeApiService } from '../coin-exchange-rate/coin-exchange-api.service';
 import { CoinExchangeRateService } from '../coin-exchange-rate/coin-exchange-rate.service';
+import { CreateCoinDto } from './dto/create-coin.dto';
 
 @Injectable()
 export class CoinService {
@@ -60,8 +60,7 @@ export class CoinService {
       apiId: targetCoin.id,
     });
     await this.coinRepository.save(coin);
-
-    this.coinExchangeRateService.updateCoinsRate({ name: coin.name });
+    await this.coinExchangeRateService.updateCoinsRate({ name: coin.name });
   }
 
   async sendUpdate(data: { action: string; coins?: Coin[] }): Promise<void> {

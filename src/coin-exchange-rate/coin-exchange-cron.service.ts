@@ -16,12 +16,12 @@ export class CoinExchangeCronService {
   startJob(seconds: number) {
     const cronExpression = `${seconds} * * * * *`;
 
-    const job = new CronJob(cronExpression, () => {
+    const job = new CronJob(cronExpression, async () => {
       this.logger.warn(
         `time (${seconds}) for job ${CoinExchangeCronService.name} to run!`,
       );
       this.logger.debug(`${CoinExchangeCronService.name} cron started`);
-      this.coinExchangeRateService.updateCoinsRate();
+      await this.coinExchangeRateService.updateCoinsRate();
     });
 
     this.schedulerRegistry.addCronJob(CoinExchangeCronService.name, job);

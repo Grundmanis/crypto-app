@@ -16,7 +16,7 @@ export class CoinGateway
 
   private readonly logger = new Logger(CoinGateway.name);
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.debug('WebSocket initialized');
   }
 

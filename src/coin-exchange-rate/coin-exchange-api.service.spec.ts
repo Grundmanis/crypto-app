@@ -11,7 +11,6 @@ describe('CoinExchangeApiService', () => {
   let httpService: HttpService;
 
   const mockConfigService = {
-    get: jest.fn(),
     getOrThrow: jest.fn(),
   };
 
@@ -87,8 +86,8 @@ describe('CoinExchangeApiService', () => {
 
   describe('makeRequest', () => {
     it('should make HTTP GET request and return data', async () => {
-      mockConfigService.get.mockReturnValue('http://api.test');
       mockConfigService.getOrThrow
+        .mockReturnValueOnce('http://api.test')
         .mockReturnValueOnce('authKey')
         .mockReturnValueOnce('authValue');
 
@@ -106,8 +105,8 @@ describe('CoinExchangeApiService', () => {
     });
 
     it('should throw HttpException if request fails', async () => {
-      mockConfigService.get.mockReturnValue('http://api.test');
       mockConfigService.getOrThrow
+        .mockReturnValueOnce('http://api.test')
         .mockReturnValueOnce('authKey')
         .mockReturnValueOnce('authValue');
 
