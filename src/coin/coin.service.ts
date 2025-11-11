@@ -33,7 +33,6 @@ export class CoinService {
     const cacheKey = `coins:${filters.name || 'all'}`;
     const cached = await this.redisClient.get(cacheKey);
     if (cached) {
-      console.log({ cached });
       return JSON.parse(cached) as Coin[];
     }
 
@@ -66,7 +65,14 @@ export class CoinService {
   }
 
   async deleteCoin(id: number): Promise<void> {
+    const coin = await this.coinRepository.findOne({ where: { id } });
+
+    if (!coin) {
+      throw new Error(`Coin with id ${id} does not exist`);
+    }
+  
     await this.coinRepository.delete(id);
+    await this.clearCache();
   }
 
   async create(createCoinDto: CreateCoinDto): Promise<void> {
@@ -79,6 +85,7 @@ export class CoinService {
       apiId: targetCoin.id,
     });
     await this.coinRepository.save(coin);
+    await this.clearCache();
     await this.coinExchangeRateService.updateCoinsRate({ name: coin.name });
   }
 
@@ -88,5 +95,10 @@ export class CoinService {
       data.coins = coins;
     }
     this.coinGateway.server.emit(CoinService.EVENTS.COIN_UPDATE, data);
+  }
+
+  async clearCache(filters: { name?: string } = {}) {
+    const cacheKey = `coins:${filters.name || 'all'}`;
+    await this.redisClient.del(cacheKey);
   }
 }

@@ -61,6 +61,7 @@ export class CoinExchangeRateService {
     }
 
     if (coins.length) {
+      await this.coinService.clearCache();
       await this.coinService.sendUpdate({ action: 'rate_update' });
     }
   }
