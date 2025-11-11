@@ -15,8 +15,6 @@ $ docker compose up --watch
 cd client && npm run build
 ```
 
-# TODO: add front build in docker 
-
 ## Seeding
 Get container id
 ```
