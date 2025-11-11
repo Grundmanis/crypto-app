@@ -3,7 +3,7 @@ Copy .env.example to .env and put real values
 
 ### Running the app
 ```bash
-$ docker compose up --watch
+$ docker compose up --build
 ```
 
 ### Seeding
