@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CoinService } from './coin.service';
+import { CoinService } from './services/coin.service';
 import { Coin } from './coin.entity';
 import { CreateCoinDto } from './dto/create-coin.dto';
 

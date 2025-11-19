@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CoinService } from './coin.service';
-import { CoinExchangeApiService } from '../coin-exchange-rate/coin-exchange-api.service';
-import { CoinExchangeRateService } from '../coin-exchange-rate/coin-exchange-rate.service';
-import { CoinGateway } from './coin.gateway';
+import { CoinExchangeApiService } from '../../coin-exchange-rate/services/coin-exchange-api.service';
+import { CoinExchangeRateService } from '../../coin-exchange-rate/services/coin-exchange-rate.service';
+import { CoinGateway } from '../coin.gateway';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Coin } from './coin.entity';
-import { CreateCoinDto } from './dto/create-coin.dto';
+import { Coin } from '../coin.entity';
+import { CreateCoinDto } from '../dto/create-coin.dto';
 
 describe('CoinService', () => {
   let service: CoinService;

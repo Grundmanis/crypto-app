@@ -1,12 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { CoinService } from './coin.service';
+import { CoinService } from './services/coin.service';
 import { CoinController } from './coin.controller';
 import { Coin } from './coin.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { CoinGateway } from './coin.gateway';
 import { CoinExchangeRateModule } from 'src/coin-exchange-rate/coin-exchange-rate.module';
-import { redisProvider } from 'src/redis.provider';
+import { redisProvider } from 'src/utils/redis.provider';
 
 @Module({
   imports: [

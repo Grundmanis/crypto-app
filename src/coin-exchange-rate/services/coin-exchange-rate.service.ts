@@ -1,13 +1,13 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CoinExchangeRate } from './coin-exchange-rate.entity';
+import { CoinExchangeRate } from '../coin-exchange-rate.entity';
 import { Repository } from 'typeorm';
-import { CoinService } from '../coin/coin.service';
+import { CoinService } from '../../coin/services/coin.service';
 import { CoinExchangeApiService } from './coin-exchange-api.service';
-import { Coin } from '../coin/coin.entity';
+import { Coin } from '../../coin/coin.entity';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
 import { ConfigService } from '@nestjs/config';
-import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
+import { CreateExchangeRateDto } from '../dto/create-exchange-rate.dto';
 
 @Injectable()
 export class CoinExchangeRateService {

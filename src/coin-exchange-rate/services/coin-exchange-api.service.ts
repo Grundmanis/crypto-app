@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import qs from 'qs';
-import { CoinCurrentPrice } from './types/coin-current-price.type';
-import { CoinData } from './types/coin-data.type';
+import { CoinCurrentPrice } from '../types/coin-current-price.type';
+import { CoinData } from '../types/coin-data.type';
 
 @Injectable()
 export class CoinExchangeApiService {

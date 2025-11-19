@@ -8,9 +8,9 @@ export class CoinExchangeCronService {
   private readonly logger = new Logger(CoinExchangeCronService.name);
 
   constructor(
-    private readonly schedulerRegistry: SchedulerRegistry,
     @Inject(forwardRef(() => CoinExchangeRateService))
     private readonly coinExchangeRateService: CoinExchangeRateService,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
   startJob(seconds: number) {

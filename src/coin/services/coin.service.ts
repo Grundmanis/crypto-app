@@ -1,18 +1,18 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Coin } from './coin.entity';
+import { Coin } from '../coin.entity';
 import { Repository } from 'typeorm';
-import { CoinGateway } from './coin.gateway';
-import { CoinExchangeApiService } from '../coin-exchange-rate/coin-exchange-api.service';
-import { CoinExchangeRateService } from '../coin-exchange-rate/coin-exchange-rate.service';
-import { CreateCoinDto } from './dto/create-coin.dto';
+import { CoinGateway } from '../coin.gateway';
+import { CoinExchangeApiService } from '../../coin-exchange-rate/services/coin-exchange-api.service';
+import { CoinExchangeRateService } from '../../coin-exchange-rate/services/coin-exchange-rate.service';
+import { CreateCoinDto } from '../dto/create-coin.dto';
 import Redis from 'ioredis';
 
 @Injectable()
 export class CoinService {
   private readonly logger = new Logger(CoinService.name);
   private readonly cacheTTL =
-    Number(process.env.EXCHANGE_RATE_PULL_INTERVAL_SECONDS) || 10;
+    Number(process.env.CACHE_TTL_SECONDS) || 10;
 
   public static EVENTS = {
     COIN_UPDATE: 'coinUpdate',
@@ -21,12 +21,12 @@ export class CoinService {
   constructor(
     @InjectRepository(Coin)
     private readonly coinRepository: Repository<Coin>,
-    private readonly coinExchangeApiService: CoinExchangeApiService,
     @Inject(forwardRef(() => CoinExchangeRateService))
     private readonly coinExchangeRateService: CoinExchangeRateService,
-    private readonly coinGateway: CoinGateway,
     @Inject('REDIS_CLIENT')
     private readonly redisClient: Redis,
+    private readonly coinExchangeApiService: CoinExchangeApiService,
+    private readonly coinGateway: CoinGateway,
   ) {}
 
   async findAll(filters: { name?: string } = {}): Promise<Coin[]> {

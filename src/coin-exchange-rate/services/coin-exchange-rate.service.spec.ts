@@ -3,10 +3,10 @@ import {
   CoinExchangeRateService,
 } from './coin-exchange-rate.service';
 import { CoinExchangeCronService } from './coin-exchange-cron.service';
-import { CoinService } from '../coin/coin.service';
+import { CoinService } from '../../coin/services/coin.service';
 import { CoinExchangeApiService } from './coin-exchange-api.service';
 import { Repository } from 'typeorm';
-import { CoinExchangeRate } from './coin-exchange-rate.entity';
+import { CoinExchangeRate } from '../coin-exchange-rate.entity';
 import { ConfigService } from '@nestjs/config';
 
 describe('CoinExchangeRateService', () => {
